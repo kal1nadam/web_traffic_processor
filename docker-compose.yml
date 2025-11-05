@@ -1,0 +1,9 @@
+services:
+  python-app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    volumes:
+      - ./src:/app/src
+    command: ["python", "-m", "app.cli", "Adam"]
+
