@@ -73,6 +73,58 @@ ATTRIBUTION_SQL = """
         WHERE rn = 1
     """
 
+PROCESS_ORDERS_SQL = """
+        WITH exploded AS (
+        SELECT
+            e.event_timestamp,
+            e.hostname,
+            e.user_pseudo_id,
+            e.items,
+            (ep).key AS k,
+            (ep).value.string_value AS string_val,
+            (ep).value.int_value    AS int_val,
+            (ep).value.double_value AS double_val
+        FROM events AS e,
+            UNNEST(e.event_params) AS u(ep)
+        WHERE e.event_name = 'purchase'
+        ),
+        purchases AS (
+            SELECT
+                event_timestamp,
+                hostname,
+                user_pseudo_id,
+                MAX(CASE WHEN k = 'currency' THEN string_val END) AS currency,
+                MAX(CASE WHEN k = 'value' THEN COALESCE(double_val, int_val) END) AS value,
+                LIST_TRANSFORM(items, i -> STRUCT_PACK(
+                    item_id := i.item_id,
+                    item_name := i.item_name,
+                    price := i.price,
+                    quantity := i.quantity
+                )) AS items_simplified
+            FROM exploded
+            GROUP BY event_timestamp, hostname, user_pseudo_id, items
+        ),
+        joined AS (
+            SELECT
+                p.event_timestamp,
+                p.hostname,
+                p.user_pseudo_id,
+                p.currency,
+                p.value,
+                p.items_simplified,
+                a.source,
+                a.medium,
+                a.campaign
+            FROM purchases AS p
+            LEFT JOIN purchase_last_click_attributions AS a
+                ON p.hostname = a.hostname
+            AND p.user_pseudo_id = a.user_pseudo_id
+        )
+        SELECT *
+        FROM joined
+        ORDER BY event_timestamp DESC;
+    """
+
 @contextmanager
 def connect(db_path: str = DEFAULT_DB_PATH):
     con = duckdb.connect(db_path)
@@ -109,7 +161,6 @@ def init_db(db_path: str = DEFAULT_DB_PATH, events_glob: str = DEFAULT_EVENTS_GL
         con.execute("DROP VIEW events_seed;")
 
 
-
 def calc_purchase_attributions(db_path: str = DEFAULT_DB_PATH):
     """
     Calculate last click attributions for purchases and store them in a table.
@@ -122,6 +173,23 @@ def calc_purchase_attributions(db_path: str = DEFAULT_DB_PATH):
             "INSERT INTO purchase_last_click_attributions (user_pseudo_id, hostname, event_timestamp, source, medium, campaign) "
             + ATTRIBUTION_SQL
         )
+
+
+def process_orders(db_path: str = DEFAULT_DB_PATH):
+    """
+    Process orders.
+    Match purchase events from events table with last-click attribution data from purchase_last_click_attributions table.
+    Return orders.
+    """
+    with connect(db_path) as con:
+        orders_df = con.execute(PROCESS_ORDERS_SQL).fetchdf()
+
+        return orders_df
+
+
+
+
+
 
 def get_connection_test(db_path: str = DEFAULT_DB_PATH):
     """
