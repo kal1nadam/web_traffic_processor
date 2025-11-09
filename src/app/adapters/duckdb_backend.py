@@ -97,7 +97,7 @@ def process_orders(db_path: str = DEFAULT_DB_PATH):
             quantity = None if qty_raw is None else int(qty_raw)
             products.append(
             Product(
-                id=i.get("item_id"),
+                feed_id=i.get("item_id"),
                 name=i.get("item_name"),
                 price=price,
                 quantity=quantity,

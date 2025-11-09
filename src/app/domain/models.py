@@ -1,17 +1,20 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional
+import uuid
 
 
 @dataclass
 class Product:
-    id: str
+    id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    feed_id: str
     name: str
     price: Optional[float]
     quantity: Optional[int]
 
 @dataclass
 class Order:
+    id: str = field(default_factory=lambda: str(uuid.uuid4()))
     event_timestamp: datetime
     hostname: str
     user_pseudo_id: str
