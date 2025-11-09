@@ -1,7 +1,10 @@
 from contextlib import contextmanager
+import json
 import os
 import duckdb
 from pathlib import Path
+
+from app.domain.models import Order, Product
 
 
 DEFAULT_DB_PATH = os.getenv("DUCKDB_PATH", "data/local.duckdb")
@@ -77,9 +80,45 @@ def process_orders(db_path: str = DEFAULT_DB_PATH):
     with connect(db_path) as con:
         orders_df = con.execute(PROCESS_ORDERS_SQL).fetchdf()
 
-        return orders_df
+    orders = []
+    for _, row in orders_df.iterrows():
+        raw_products = row["products"]
 
+        if isinstance(raw_products, str):
+            products_data = json.loads(raw_products)
+        else:
+            products_data = raw_products
 
+        products = []
+        for i in (products_data if products_data is not None else []):
+            price_raw = i.get("price")
+            price = None if price_raw is None else float(price_raw)
+            qty_raw = i.get("quantity")
+            quantity = None if qty_raw is None else int(qty_raw)
+            products.append(
+            Product(
+                id=i.get("item_id"),
+                name=i.get("item_name"),
+                price=price,
+                quantity=quantity,
+            )
+        )
+
+        order = Order(
+            event_timestamp=row["event_timestamp"],
+            hostname=row["hostname"],
+            user_pseudo_id=row["user_pseudo_id"],
+            currency=row["currency"],
+            value=row["value"],
+            source=row["source"],
+            medium=row["medium"],
+            campaign=row["campaign"],
+            products=products,
+        )
+
+        orders.append(order)
+
+    return orders
 
 
 
