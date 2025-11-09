@@ -35,7 +35,7 @@ WITH exploded AS (
                 p.user_pseudo_id,
                 p.currency,
                 p.value,
-                p.items_simplified,
+                p.items_simplified AS products,
                 a.source,
                 a.medium,
                 a.campaign
