@@ -1,5 +1,6 @@
 import typer
-from app.adapters.duckdb_backend import init_db, calc_attributions, get_connection_test, process_orders
+from app.adapters.duckdb_backend import init_db, calc_attributions, get_connection_test, fetch_orders
+from app.services.order_processing_service import process_orders
 
 app = typer.Typer(help="CLI application for managing tasks.")
 
@@ -22,6 +23,8 @@ def calc_attributions_cmd():
 @app.command("test")
 def test_cmd():
     print("Testing...")
+
+    process_orders()
     # con = get_connection_test()
     # typer.echo(con.execute("SELECT * FROM events LIMIT 10").fetchdf()) 
     # con.execute("DROP TABLE events")
@@ -29,6 +32,9 @@ def test_cmd():
     # con.execute("DROP VIEW events_seed;")
 
     # orders = process_orders()
+
+    # for order in orders[:20]:
+    #     typer.echo(order)
 
 
 if __name__ == "__main__":
