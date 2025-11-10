@@ -3,18 +3,21 @@ from datetime import datetime
 from typing import Optional
 import uuid
 
-
 @dataclass
-class Product:
-    id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    feed_id: str
-    name: str
+class OrderProduct:
+    order_id: str
+    product_id: str
     price: Optional[float]
     quantity: Optional[int]
 
 @dataclass
-class Order:
+class Product:
+    feed_id: str
+    name: str
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
+
+@dataclass
+class Order:
     event_timestamp: datetime
     hostname: str
     user_pseudo_id: str
@@ -23,4 +26,4 @@ class Order:
     source: Optional[str]
     medium: Optional[str]
     campaign: Optional[str]
-    products: list[Product] = field(default_factory=list)
+    id: str = field(default_factory=lambda: str(uuid.uuid4()))
