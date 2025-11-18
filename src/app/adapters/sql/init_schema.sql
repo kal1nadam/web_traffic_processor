@@ -11,6 +11,7 @@ CREATE TABLE products (
     id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     feed_id     VARCHAR NOT NULL,
     name        VARCHAR NOT NULL,
+    hash        VARCHAR UNIQUE,
     UNIQUE (feed_id, name)
 );
 
@@ -23,7 +24,8 @@ CREATE TABLE orders (
     value             DOUBLE,
     source            VARCHAR,
     medium            VARCHAR,
-    campaign          VARCHAR
+    campaign          VARCHAR,
+    hash       VARCHAR UNIQUE
 );
 
 CREATE TABLE order_to_products (
