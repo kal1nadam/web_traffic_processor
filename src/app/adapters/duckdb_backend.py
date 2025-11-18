@@ -119,13 +119,3 @@ def fetch_orders(db_path: str = DEFAULT_DB_PATH):
         orders.append(order)
 
     return orders
-
-
-
-
-# TODO delete
-def get_connection_test(db_path: str = DEFAULT_DB_PATH):
-    """
-    Returns a DuckDB connection to the specified database path for testing purposes.
-    """
-    return duckdb.connect(db_path)

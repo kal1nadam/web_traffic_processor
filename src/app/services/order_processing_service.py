@@ -36,7 +36,6 @@ def process_orders():
     print("Saving order-product relationships into the database...")
     repo.add_order_products([order_product for _, _, order_products in mapped_orders for order_product in order_products])
 
-# TODO remove_existing_orders
 def deduplicate_orders(repo: DbRepository, orders: list[tuple[Order, list[Product], list[OrderProduct]]]) -> list[tuple[Order, list[Product], list[OrderProduct]]]:
     # Gather all hashes from the orders
     order_hashes = [order.hash for order, _, _ in orders]
