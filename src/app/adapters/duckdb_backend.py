@@ -4,7 +4,6 @@ import os
 import duckdb
 from pathlib import Path
 
-from app.domain.models import Order, OrderProduct, Product
 from app.dto.order_dto import OrderDTO, ProductDTO
 
 
@@ -121,61 +120,7 @@ def fetch_orders(db_path: str = DEFAULT_DB_PATH):
 
     return orders
 
-# TODO move into repository
-def get_products_by_feed_ids(feed_ids: list[str], db_path: str = DEFAULT_DB_PATH) -> list[Product]:
-    with connect(db_path) as con:
-        products_df = con.execute(
-            f"SELECT * FROM products WHERE feed_id IN ({','.join(['?'] * len(feed_ids))})",
-            feed_ids
-        ).fetchdf()
 
-    return [Product(**row) for row in products_df.to_dict(orient="records")]
-
-def add_orders(orders: list[Order], db_path: str = DEFAULT_DB_PATH):
-    with connect(db_path) as con:
-        for order in orders:
-            con.execute(
-                "INSERT INTO orders (id, event_timestamp, hostname, user_pseudo_id, currency, value, source, medium, campaign) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (
-                    order.id,
-                    order.event_timestamp,
-                    order.hostname,
-                    order.user_pseudo_id,
-                    order.currency,
-                    order.value,
-                    order.source,
-                    order.medium,
-                    order.campaign,
-                )
-            )
-
-def add_products(products: list[Product], db_path: str = DEFAULT_DB_PATH):
-    with connect(db_path) as con:
-        for product in products:
-            con.execute(
-                "INSERT INTO products (id, feed_id, name) "
-                "VALUES (?, ?, ?)",
-                (
-                    product.id,
-                    product.feed_id,
-                    product.name,
-                )
-            )
-
-def add_order_products(order_products: list[OrderProduct], db_path: str = DEFAULT_DB_PATH):
-    with connect(db_path) as con:
-        for op in order_products:
-            con.execute(
-                "INSERT INTO order_to_products (order_id, product_id, price, quantity) "
-                "VALUES (?, ?, ?, ?)",
-                (
-                    op.order_id,
-                    op.product_id,
-                    op.price,
-                    op.quantity,
-                )
-            )
 
 
 # TODO delete
