@@ -1,6 +1,7 @@
 import typer
-from app.adapters.duckdb_backend import init_db, calc_attributions, get_connection_test, fetch_orders
-from app.services.order_processing_service import process_orders
+from app.adapters.duckdb_backend import init_db, calc_attributions
+from app.services.order_processing_service import import_orders
+from app.adapters.repositories.db_repository import DbRepository
 
 app = typer.Typer(help="CLI application for managing tasks.")
 
@@ -13,28 +14,29 @@ def run_cmd(name: str):
 
 @app.command("init-db")
 def init_db_cmd():
+    print("Initializing database...")
     init_db()
-
+    print("Database initialized successfully.")
 
 @app.command("calc-attributions")
 def calc_attributions_cmd():
+    print("Calculating attributions...")
     calc_attributions()
+    print("Attributions calculated successfully.")
 
-@app.command("test")
-def test_cmd():
-    print("Testing...")
+@app.command("import-orders")
+def import_orders_cmd():
+    print("Importing orders...")
+    import_orders()
+    print("Orders imported successfully.")
 
-    process_orders()
-    # con = get_connection_test()
-    # typer.echo(con.execute("SELECT * FROM events LIMIT 10").fetchdf()) 
-    # con.execute("DROP TABLE events")
-    # con.execute("DROP TABLE purchase_last_click_attributions")
-    # con.execute("DROP VIEW events_seed;")
+@app.command("get-orders")
+def get_orders_cmd(page: int, page_size: int):
+    repo = DbRepository()
 
-    # orders = process_orders()
-
-    # for order in orders[:20]:
-    #     typer.echo(order)
+    orders = repo.get_orders(page, page_size)
+    for order in orders:
+        typer.echo(order)
 
 
 if __name__ == "__main__":
