@@ -8,6 +8,8 @@ class DbRepository:
         self.db_path = db_path
 
     def get_products_by_hash(self, hashes: list[str]) -> list[Product]:
+        if not hashes:
+            return []
         with connect(self.db_path) as con:
             products_df = con.execute(
                 f"SELECT * FROM products WHERE hash IN ({','.join(['?'] * len(hashes))})",
@@ -17,6 +19,8 @@ class DbRepository:
         return [Product(**row) for row in products_df.to_dict(orient="records")]
 
     def get_orders_by_hash(self, hashes: list[str]) -> list[Order]:
+        if not hashes:
+            return []
         with connect(self.db_path) as con:
             orders_df = con.execute(
                 f"SELECT * FROM orders WHERE hash IN ({','.join(['?'] * len(hashes))})",
