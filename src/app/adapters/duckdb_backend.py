@@ -21,6 +21,8 @@ INIT_SCHEMA_SQL = load_sql("init_schema")
 CALC_ATTRIBUTION_SQL = load_sql("calc_attribution")
 PROCESS_ORDERS_SQL = load_sql("process_orders")
 
+
+
 @contextmanager
 def connect(db_path: str = DEFAULT_DB_PATH):
     con = duckdb.connect(db_path)
@@ -52,7 +54,7 @@ def init_db(db_path: str = DEFAULT_DB_PATH, events_glob: str = DEFAULT_EVENTS_GL
         con.execute("DELETE FROM events;")
         con.execute(
             "INSERT INTO events (event_name, event_timestamp, user_pseudo_id, hostname, event_params, items) "
-            "SELECT event_name, event_timestamp, user_pseudo_id, device.web_info.hostname AS hostname, event_params, items FROM events_seed WHERE user_pseudo_id IS NOT NULL;"
+            "SELECT event_name, event_timestamp, user_pseudo_id, hostname, event_params, items FROM events_seed WHERE user_pseudo_id IS NOT NULL;"
         )
         con.execute("DROP VIEW events_seed;")
 
