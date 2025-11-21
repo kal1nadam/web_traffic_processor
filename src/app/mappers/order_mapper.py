@@ -24,6 +24,9 @@ def map_order_dto_to_domain_order(dto: OrderDTO) -> tuple[Order, list[Product], 
 
     # map each DTO product to a domain Product + junction entity
     for p in dto.products:
+        if p.feed_id is None:
+            continue
+
         product = Product(
             feed_id=p.feed_id,
             name=p.name,
