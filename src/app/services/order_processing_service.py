@@ -4,7 +4,7 @@ from app.mappers.order_mapper import map_order_dto_to_domain_order
 from app.adapters.repositories.db_repository import DbRepository
 
 
-def process_orders():
+def import_orders():
     # Fetch orders from the DuckDB backend
     print("Fetching orders...")
     fetched_orders = fetch_orders()
