@@ -1,5 +1,5 @@
 services:
-  python-app:
+  web_traffic_processor:
     build:
       context: .
       dockerfile: docker/Dockerfile
