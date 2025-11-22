@@ -2,7 +2,7 @@
 name = "web_traffic_processor"
 version = "0.1.0"
 description = "A tool to process and analyze web traffic data."
-authors = ["Adam Kalina <kalinaadam75@seznam.cz>"]
+authors = ["Adam Kalina <kalinaadam75@gmail.com>"]
 license = "MIT"
 packages = [{ include = "app", from = "src" }]
 
