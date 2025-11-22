@@ -1,10 +1,16 @@
+DROP TABLE IF EXISTS events;
+DROP TABLE IF EXISTS products;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS order_to_products;
+DROP TABLE IF EXISTS purchase_last_click_attributions;
+
 CREATE TABLE IF NOT EXISTS events (
     event_name VARCHAR,
     event_timestamp BIGINT,
     user_pseudo_id VARCHAR,
     hostname VARCHAR,
     event_params STRUCT(key VARCHAR, value STRUCT(string_value VARCHAR, int_value BIGINT, float_value DOUBLE, double_value DOUBLE))[],
-    items STRUCT(item_id VARCHAR, item_name VARCHAR, item_brand VARCHAR, item_variant VARCHAR, item_category VARCHAR, item_category2 VARCHAR, item_category3 VARCHAR, item_category4 VARCHAR, item_category5 VARCHAR, price_in_usd DOUBLE, price DOUBLE, quantity BIGINT, item_revenue_in_usd DOUBLE, item_revenue DOUBLE, item_refund_in_usd DOUBLE, item_refund DOUBLE, coupon VARCHAR, affiliation VARCHAR, location_id VARCHAR, item_list_id VARCHAR, item_list_name VARCHAR, item_list_index VARCHAR, promotion_id VARCHAR, promotion_name VARCHAR, creative_name VARCHAR, creative_slot VARCHAR, item_params STRUCT("key" VARCHAR, "value" STRUCT(string_value VARCHAR, int_value BIGINT, float_value DOUBLE, double_value DOUBLE))[])[]
+    items STRUCT(item_id VARCHAR, item_name VARCHAR, price DOUBLE, quantity BIGINT)[]
 );
 
 CREATE TABLE products (
@@ -14,6 +20,7 @@ CREATE TABLE products (
     hash        VARCHAR UNIQUE,
     UNIQUE (feed_id, name)
 );
+
 
 CREATE TABLE orders (
     id                UUID DEFAULT gen_random_uuid() PRIMARY KEY,
