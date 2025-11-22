@@ -20,3 +20,5 @@ COPY src ./src
 # COPY tests ./tests
 
 RUN poetry install --no-interaction --no-ansi
+
+ENTRYPOINT ["python", "-m", "app.cli"]
